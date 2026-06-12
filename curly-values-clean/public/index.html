@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Тест на цінності — Curly Management</title>
+<meta name="description" content="Визначте свій ціннісний профіль і отримайте розшифровку під вашу роль в організації">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --ink: #1a1a1a; --ink-muted: #555; --ink-hint: #999;
+  --bg: #fff; --surface: #f8f7f5;
+  --border: rgba(0,0,0,0.08); --border-md: rgba(0,0,0,0.15);
+  --purple-light: #EEEDFE; --purple-mid: #7F77DD; --purple-dark: #3C3489;
+  --radius-md: 8px; --radius-lg: 14px;
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body: 'Manrope', system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #f0ede8; --ink-muted: #a8a49e; --ink-hint: #6b6760;
+    --bg: #141412; --surface: #1e1d1a;
+    --border: rgba(255,255,255,0.08); --border-md: rgba(255,255,255,0.15);
+    --purple-light: #1e1b40; --purple-mid: #9590e8; --purple-dark: #b8b3f0;
+  }
+}
+html { font-size: 16px; }
+body { font-family: var(--font-body); background: var(--bg); color: var(--ink); min-height: 100vh; line-height: 1.6; }
+.page { max-width: 600px; margin: 0 auto; padding: 3rem 1.5rem 5rem; }
+.brand { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-hint); margin-bottom: 2.5rem; display: flex; align-items: center; gap: 8px; }
+.brand::before { content: ''; display: inline-block; width: 18px; height: 2px; background: var(--purple-mid); }
+.screen { display: none; }
+.screen.active { display: block; }
+.hero { font-family: var(--font-display); font-size: clamp(2rem, 5vw, 2.6rem); font-weight: 400; line-height: 1.25; color: var(--ink); margin-bottom: 1.25rem; }
+.hero em { font-style: italic; color: var(--purple-mid); }
+.lead { font-size: 15px; line-height: 1.75; color: var(--ink-muted); margin-bottom: 2.5rem; max-width: 480px; }
+.section-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-hint); margin-bottom: 0.875rem; }
+.role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 2.5rem; }
+@media (max-width: 480px) { .role-grid { grid-template-columns: 1fr; } }
+.role-card { border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.1rem 1.25rem; cursor: pointer; transition: border-color 0.15s ease, background 0.15s ease, transform 0.1s ease; background: var(--bg); text-align: left; }
+.role-card:hover { border-color: var(--border-md); background: var(--surface); transform: translateY(-1px); }
+.role-card.selected { border-color: var(--purple-mid); border-width: 1.5px; background: var(--purple-light); }
+.role-card.selected .role-title { color: var(--purple-dark); }
+.role-card.selected .role-sub { color: var(--purple-mid); }
+.role-title { font-size: 14px; font-weight: 500; color: var(--ink); margin-bottom: 3px; }
+.role-sub { font-size: 12px; color: var(--ink-muted); line-height: 1.4; }
+.btn { display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-body); font-size: 14px; font-weight: 500; border-radius: var(--radius-md); padding: 0.75rem 1.5rem; cursor: pointer; transition: opacity 0.15s, background 0.15s, transform 0.1s; border: none; text-decoration: none; }
+.btn:active { transform: scale(0.98); }
+.btn-primary { background: var(--ink); color: var(--bg); }
+.btn-primary:hover:not(:disabled) { opacity: 0.82; }
+.btn-primary:disabled { opacity: 0.3; cursor: not-allowed; }
+.btn-ghost { background: transparent; color: var(--ink-muted); border: 1px solid var(--border-md); }
+.btn-ghost:hover { background: var(--surface); }
+.progress-wrap { margin-bottom: 2.5rem; }
+.progress-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+.progress-step { font-size: 12px; color: var(--ink-hint); }
+.progress-pct { font-size: 12px; color: var(--purple-mid); font-weight: 500; }
+.progress-track { height: 2px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--purple-mid); border-radius: 2px; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+.q-text { font-family: var(--font-display); font-size: clamp(1.2rem, 3.5vw, 1.5rem); font-weight: 400; line-height: 1.4; color: var(--ink); margin-bottom: 0.5rem; }
+.q-hint { font-size: 13px; color: var(--ink-hint); font-style: italic; margin-bottom: 2rem; min-height: 20px; }
+.answers { display: flex; flex-direction: column; gap: 10px; margin-bottom: 2.5rem; }
+.answer-btn { border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.25rem; text-align: left; background: var(--bg); cursor: pointer; transition: border-color 0.15s, background 0.15s, transform 0.1s; font-family: var(--font-body); font-size: 14px; line-height: 1.55; color: var(--ink); display: flex; align-items: flex-start; gap: 12px; }
+.answer-btn:hover { border-color: var(--border-md); background: var(--surface); transform: translateX(2px); }
+.answer-btn.selected { border-color: var(--purple-mid); border-width: 1.5px; background: var(--purple-light); color: var(--purple-dark); }
+.answer-marker { width: 20px; height: 20px; min-width: 20px; border-radius: 50%; border: 1.5px solid var(--border-md); margin-top: 1px; transition: border-color 0.15s, background 0.15s; display: flex; align-items: center; justify-content: center; }
+.answer-btn.selected .answer-marker { background: var(--purple-mid); border-color: var(--purple-mid); }
+.answer-btn.selected .answer-marker::after { content: ''; width: 6px; height: 6px; background: white; border-radius: 50%; }
+.nav-row { display: flex; justify-content: space-between; align-items: center; }
+.loading-wrap { padding: 5rem 0; text-align: center; }
+.spinner { width: 40px; height: 40px; border: 2px solid var(--border); border-top-color: var(--purple-mid); border-radius: 50%; animation: spin 0.75s linear infinite; margin: 0 auto 1.5rem; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-msg { font-size: 14px; color: var(--ink-muted); transition: opacity 0.3s; }
+.result-role-tag { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--purple-mid); border: 1px solid var(--purple-mid); border-radius: 100px; padding: 3px 12px; margin-bottom: 1.25rem; opacity: 0.8; }
+.result-title { font-family: var(--font-display); font-size: clamp(1.8rem, 4vw, 2.4rem); font-weight: 400; line-height: 1.2; color: var(--ink); margin-bottom: 2rem; }
+.bars-section { margin-bottom: 2rem; }
+.bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.bar-label { font-size: 12px; color: var(--ink-muted); min-width: 100px; }
+.bar-track { flex: 1; height: 5px; background: var(--border); border-radius: 5px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 5px; transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1); }
+.bar-fill.blue { background: #5886C8; }
+.bar-fill.orange { background: #E07C3A; }
+.bar-fill.green { background: #4A9E72; }
+.bar-fill.yellow { background: #C9A227; }
+.bar-fill.red { background: #C0392B; }
+.bar-pct { font-size: 12px; color: var(--ink-hint); min-width: 32px; text-align: right; font-variant-numeric: tabular-nums; }
+.divider { height: 1px; background: var(--border); margin: 1.75rem 0; }
+.legend-title { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-hint); margin-bottom: 1rem; cursor: pointer; display: flex; align-items: center; gap: 6px; user-select: none; }
+.legend-title .toggle-arrow { font-size: 10px; transition: transform 0.2s; display: inline-block; }
+.legend-title.open .toggle-arrow { transform: rotate(180deg); }
+.legend-grid { display: none; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.5rem; }
+.legend-grid.visible { display: grid; }
+@media (max-width: 480px) { .legend-grid { grid-template-columns: 1fr; } }
+.legend-card { border-radius: var(--radius-md); padding: 0.875rem 1rem; border-left: 3px solid transparent; }
+.legend-card.blue { background: #EEF3FB; border-left-color: #5886C8; }
+.legend-card.orange { background: #FDF3EB; border-left-color: #E07C3A; }
+.legend-card.green { background: #EDF7F2; border-left-color: #4A9E72; }
+.legend-card.yellow { background: #FBF6E8; border-left-color: #C9A227; }
+.legend-card.red { background: #FDECEA; border-left-color: #C0392B; }
+@media (prefers-color-scheme: dark) {
+  .legend-card.blue { background: #0e1e35; } .legend-card.orange { background: #2a1a0a; }
+  .legend-card.green { background: #0a1f14; } .legend-card.yellow { background: #1f1800; }
+  .legend-card.red { background: #2a0a0a; }
+}
+.legend-card-name { font-size: 13px; font-weight: 500; color: var(--ink); margin-bottom: 3px; }
+.legend-card-desc { font-size: 12px; color: var(--ink-muted); line-height: 1.5; }
+.interpretation-label { margin-bottom: 1rem; }
+.interpretation-body { font-size: 14px; line-height: 1.85; color: var(--ink); word-break: break-word; }
+.interp-section { margin-bottom: 1.5rem; }
+.interp-section-title { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--purple-mid); margin-bottom: 0.5rem; }
+.interp-section-body { font-size: 14px; line-height: 1.85; color: var(--ink); white-space: pre-wrap; }
+.cursor-blink { display: inline-block; width: 2px; height: 1.1em; background: var(--purple-mid); margin-left: 2px; vertical-align: text-bottom; animation: blink 1s step-end infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+.result-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 2.5rem; }
+.share-note { margin-top: 2rem; padding: 1rem 1.25rem; background: var(--surface); border-radius: var(--radius-lg); font-size: 13px; color: var(--ink-muted); line-height: 1.6; }
+.share-note strong { color: var(--ink); font-weight: 500; }
+.payment-block { margin: 1.75rem 0; padding: 1.5rem; border: 1px solid var(--border-md); border-radius: var(--radius-lg); text-align: center; }
+.payment-title { font-family: var(--font-display); font-size: 1.1rem; font-weight: 400; color: var(--ink); margin-bottom: 0.5rem; }
+.payment-desc { font-size: 13px; color: var(--ink-muted); margin-bottom: 1.25rem; line-height: 1.6; }
+.payment-price { font-size: 22px; font-weight: 600; color: var(--ink); margin-bottom: 1.25rem; }
+.payment-price span { font-size: 13px; font-weight: 400; color: var(--ink-muted); }
+.btn-pay { background: #2E7D32; color: #fff; border: none; border-radius: var(--radius-md); padding: 0.875rem 2rem; font-family: var(--font-body); font-size: 15px; font-weight: 500; cursor: pointer; transition: opacity 0.15s; width: 100%; }
+.btn-pay:hover { opacity: 0.88; }
+.btn-pay:disabled { opacity: 0.4; cursor: not-allowed; }
+.payment-secure { font-size: 11px; color: var(--ink-hint); margin-top: 0.75rem; }
+.payment-checking { font-size: 13px; color: var(--ink-muted); margin-top: 1rem; display: none; }
+footer { margin-top: 4rem; padding-top: 1.5rem; border-top: 1px solid var(--border); font-size: 12px; color: var(--ink-hint); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+footer a { color: var(--ink-hint); text-decoration: none; }
+footer a:hover { color: var(--ink-muted); }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="brand">Curly Management Bureau</div>
+
+  <div class="screen active" id="s-intro">
+    <h1 class="hero">Тест на <em>цінності</em>.<br>Розшифровка під вашу роль.</h1>
+    <p class="lead">15 питань — і ви побачите свій ціннісний профіль крізь призму Spiral Dynamics. Інтерпретація адаптується під вашу роль в організації.</p>
+    <div class="section-label">Оберіть свою роль</div>
+    <div class="role-grid">
+      <button class="role-card" data-role="founder" onclick="selectRole(this)">
+        <div class="role-title">Засновник / CEO</div>
+        <div class="role-sub">Будую організацію і ухвалюю стратегічні рішення</div>
+      </button>
+      <button class="role-card" data-role="manager" onclick="selectRole(this)">
+        <div class="role-title">Менеджер / тімлід</div>
+        <div class="role-sub">Керую командою і відповідаю за результат</div>
+      </button>
+      <button class="role-card" data-role="team" onclick="selectRole(this)">
+        <div class="role-title">Член команди</div>
+        <div class="role-sub">Виконую задачі і взаємодію з колегами</div>
+      </button>
+      <button class="role-card" data-role="hr" onclick="selectRole(this)">
+        <div class="role-title">HR / OD спеціаліст</div>
+        <div class="role-sub">Розвиваю людей і культуру організації</div>
+      </button>
+    </div>
+    <div style="margin-bottom: 2rem; padding: 1rem 1.25rem; background: var(--surface); border-radius: var(--radius-lg); border-left: 3px solid var(--purple-mid);">
+      <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-hint); margin-bottom: 0.625rem;">Про методологію</div>
+      <p style="font-size: 13px; line-height: 1.75; color: var(--ink-muted); margin-bottom: 0.75rem;">Тест побудований на основі <strong style="color: var(--ink);">Spiral Dynamics</strong> — моделі розвитку цінностей, розробленої психологом Клером Грейвзом (Clare W. Graves) у 1970-х роках і розвиненої Доном Беком (Don Beck) та Крісом Коуваном (Chris Cowan) у книзі <em>Spiral Dynamics</em> (1996). Інтегральну версію моделі розробив філософ Кен Вілбер (Ken Wilber) у межах Integral Theory.</p>
+      <p style="font-size: 13px; line-height: 1.75; color: var(--ink-muted);">Curly Management Bureau використовує цю модель як діагностичний інструмент для роботи з організаційними цінностями — не як остаточну класифікацію людей, а як карту для розуміння поведінкових патернів і точок розвитку.</p>
+    </div>
+    <button class="btn btn-primary" id="btn-start" disabled onclick="startTest()">
+      Почати тест
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+
+  <div class="screen" id="s-question">
+    <div class="progress-wrap">
+      <div class="progress-meta">
+        <span class="progress-step" id="q-step">Питання 1 з 15</span>
+        <span class="progress-pct" id="q-pct">0%</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    </div>
+    <div class="q-text" id="q-text"></div>
+    <div class="q-hint" id="q-hint"></div>
+    <div class="answers" id="answers"></div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" id="btn-back" onclick="prevQ()" style="visibility:hidden">← Назад</button>
+      <button class="btn btn-primary" id="btn-next" disabled onclick="nextQ()">Далі →</button>
+    </div>
+  </div>
+
+  <div class="screen" id="s-loading">
+    <div class="loading-wrap">
+      <div class="spinner"></div>
+      <div class="loading-msg" id="loading-msg">Аналізуємо ваші відповіді...</div>
+    </div>
+  </div>
+
+  <div class="screen" id="s-result">
+    <div class="result-role-tag" id="result-role-tag"></div>
+    <div class="result-title" id="result-title"></div>
+    <div class="bars-section" id="bars-section"></div>
+    <div class="legend-title" onclick="toggleLegend(this)">Що означають кольори? <span class="toggle-arrow">▼</span></div>
+    <div class="legend-grid" id="legend-grid">
+      <div class="legend-card red"><div class="legend-card-name">🔴 Червоний — Сила і виживання</div><div class="legend-card-desc">Імпульсивна дія, контроль через силу, орієнтація на негайний результат. Адаптація до кризи і хаосу. Ризик — знецінення інших і вигорання.</div></div>
+      <div class="legend-card blue"><div class="legend-card-name">🔵 Синій — Порядок</div><div class="legend-card-desc">Потреба в структурі, правилах і стабільності. Сила в надійності і системності. Ризик — жорсткість і страх змін.</div></div>
+      <div class="legend-card orange"><div class="legend-card-name">🟠 Помаранчевий — Досягнення</div><div class="legend-card-desc">Орієнтація на результат, ефективність і успіх. Сила в драйві і стратегічності. Ризик — інструменталізація людей.</div></div>
+      <div class="legend-card green"><div class="legend-card-name">🟢 Зелений — Спільнота</div><div class="legend-card-desc">Цінність стосунків, консенсусу і турботи. Сила в емпатії і довірі. Ризик — уникнення конфліктів і розмиття відповідальності.</div></div>
+      <div class="legend-card yellow"><div class="legend-card-name">🟡 Жовтий — Системність</div><div class="legend-card-desc">Інтеграція складності, адаптивність і мета-мислення. Сила в баченні цілого. Ризик — відрив від операційної реальності.</div></div>
+    </div>
+    <div class="divider"></div>
+
+    <!-- PAYMENT GATE -->
+    <div id="payment-gate">
+      <div class="payment-block">
+        <div class="payment-title">Отримайте повну розшифровку</div>
+        <div class="payment-desc">Детальний аналіз вашого ціннісного профілю: патерни поведінки, сильні сторони, де це заважає і конкретні кроки до розвитку.</div>
+        <input type="email" id="email-input" placeholder="ваш@email.com" style="width:100%;padding:0.75rem 1rem;border:1px solid var(--border-md);border-radius:var(--radius-md);font-family:var(--font-body);font-size:14px;color:var(--ink);background:var(--bg);margin-bottom:0.75rem;box-sizing:border-box;" />
+        <div style="font-size:11px;color:var(--ink-hint);margin-bottom:1rem;text-align:left;">Email потрібен на випадок якщо розшифровка не завантажиться — ми зможемо надіслати її вам.</div>
+        <div class="payment-price">229 грн <span>одноразово</span></div>
+        <button class="btn-pay" id="btn-pay" onclick="startPayment()">Отримати розшифровку</button>
+        <div class="payment-secure">🔒 Оплата через Monobank — захищено</div>
+        <div style="font-size:11px;color:var(--ink-hint);margin-top:0.75rem;line-height:1.6;text-align:left;">
+          Натискаючи кнопку "Отримати розшифровку" я підтверджую, що ознайомлений(а) та погоджуюсь з <a href="https://curlymanagement.com/pravila-i-umovi" target="_blank" style="color:var(--purple-mid);">Правилами і умовами</a> та <a href="https://curlymanagement.com/pravila-povernennya-koshtiv" target="_blank" style="color:var(--purple-mid);">Правилами повернення коштів</a>.
+        </div>
+      </div>
+    </div>
+
+    <!-- РОЗШИФРОВКА (прихована до оплати) -->
+    <div id="interpretation-gate" style="display:none">
+      <div class="section-label interpretation-label">Розшифровка під вашу роль</div>
+      <div class="interpretation-body" id="interpretation-body"></div>
+      <div class="result-actions">
+        <button class="btn btn-primary" onclick="restart()">Пройти знову</button>
+        <button class="btn btn-ghost" onclick="emailResult()">Надіслати на email</button>
+        <button class="btn btn-ghost" onclick="copyResult()">Скопіювати</button>
+      </div>
+    </div>
+    <div class="share-note">
+      <strong>Хочете провести такий аналіз для всієї команди?</strong><br>
+      Curly Management Bureau допомагає організаціям діагностувати ціннісний профіль команди і будувати системи управління, що відповідають реальним цінностям людей.<br><br>
+      <a href="https://www.instagram.com/curlymanagementbureau" target="_blank" rel="noopener">@curlymanagementbureau</a>
+    </div>
+  </div>
+
+  <footer>
+    <div style="width:100%;margin-bottom:1.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+      <div>
+        <div style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-hint);margin-bottom:0.5rem;">Реквізити</div>
+        <div style="font-size:12px;color:var(--ink-muted);line-height:1.8;">ФОП Волинець Діна Юріївна<br>ІПН: 3220917808<br>07853, Київська область,<br>Бородянський район,<br>смт. Немішаєве, вул. Молодіжна, б. 2-Б</div>
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-hint);margin-bottom:0.5rem;">Контакти</div>
+        <div style="font-size:12px;color:var(--ink-muted);line-height:1.8;"><a href="tel:+380065700564" style="color:var(--ink-muted);text-decoration:none;">+380 065 700 564</a><br><a href="mailto:curlymanagement@gmail.com" style="color:var(--ink-muted);text-decoration:none;">curlymanagement@gmail.com</a></div>
+      </div>
+    </div>
+    <span>© Curly Management Bureau</span>
+    <a href="https://www.instagram.com/curlymanagementbureau" target="_blank" rel="noopener">@curlymanagementbureau</a>
+  </footer>
+</div>
+
+<script>
+const QUESTIONS = [
+  { text: "Коли у команді виникає конфлікт, я насамперед...", hint: "Уявіть реальну ситуацію з минулого досвіду", options: [
+    { text: "Беру ситуацію під контроль — вирішую сам, швидко і без зайвих обговорень", dim: "red" },
+    { text: "Чітко встановлюю правила і слідкую за їх виконанням", dim: "blue" },
+    { text: "Шукаю найефективніше рішення, яке дасть результат", dim: "orange" },
+    { text: "Слухаю кожного і шукаю рішення, яке враховує всіх", dim: "green" },
+    { text: "Дивлюся на системні причини і змінюю умови", dim: "yellow" }
+  ]},
+  { text: "Що для мене означає \"гарна робота\"?", hint: "", options: [
+    { text: "Зроблена тут і зараз, без зволікань — результат важливіший за процес", dim: "red" },
+    { text: "Виконана точно за стандартом і вчасно", dim: "blue" },
+    { text: "Досягнута мета з максимальною ефективністю", dim: "orange" },
+    { text: "Зроблена з турботою про людей і стосунки", dim: "green" },
+    { text: "Та, що відповідає глибшому сенсу і цінностям", dim: "yellow" }
+  ]},
+  { text: "Коли я ухвалюю важливе рішення, я спираюся на...", hint: "", options: [
+    { text: "Власну інтуїцію і відчуття сили — я знаю що треба робити", dim: "red" },
+    { text: "Авторитет, досвід і перевірені правила", dim: "blue" },
+    { text: "Дані, аналіз і прогноз результату", dim: "orange" },
+    { text: "Думку команди і вплив на відносини", dim: "green" },
+    { text: "Власне розуміння системи і контексту", dim: "yellow" }
+  ]},
+  { text: "Що мотивує мене найбільше на роботі?", hint: "", options: [
+    { text: "Відчуття що я контролюю ситуацію і можу вирішити будь-що", dim: "red" },
+    { text: "Стабільність, порядок і відповідність ролі", dim: "blue" },
+    { text: "Досягнення, визнання і просування вперед", dim: "orange" },
+    { text: "Зв'язок з людьми і внесок у спільне", dim: "green" },
+    { text: "Розвиток, пізнання і свобода мислити", dim: "yellow" }
+  ]},
+  { text: "Як я реагую, коли хтось порушує домовленості?", hint: "", options: [
+    { text: "Реагую різко і одразу — не можна дозволяти собі сідати на голову", dim: "red" },
+    { text: "Нагадую про правила і наполягаю на їх дотриманні", dim: "blue" },
+    { text: "Оцінюю вплив на результат і дію відповідно", dim: "orange" },
+    { text: "Намагаюсь зрозуміти причину і зберегти стосунки", dim: "green" },
+    { text: "Дивлюся на патерн і змінюю систему, а не людину", dim: "yellow" }
+  ]},
+  { text: "Як я ставлюся до змін в організації?", hint: "", options: [
+    { text: "Якщо треба — ламаю все і будую з нуля, не чекаю дозволу", dim: "red" },
+    { text: "З обережністю — зміни мають бути виправдані і контрольовані", dim: "blue" },
+    { text: "Позитивно, якщо вони підвищують ефективність", dim: "orange" },
+    { text: "З увагою до того, як вони вплинуть на людей", dim: "green" },
+    { text: "Як до природного процесу адаптації системи", dim: "yellow" }
+  ]},
+  { text: "Мій ідеальний стиль комунікації в команді...", hint: "", options: [
+    { text: "Прямий і жорсткий — люди мають чітко розуміти що від них вимагається", dim: "red" },
+    { text: "Чіткий, структурований, з ролями і протоколами", dim: "blue" },
+    { text: "Прямий, орієнтований на задачі і результат", dim: "orange" },
+    { text: "Відкритий, теплий, де кожен може висловитися", dim: "green" },
+    { text: "Контекстний — різний залежно від ситуації", dim: "yellow" }
+  ]},
+  { text: "Коли я думаю про майбутнє організації, я фокусуюсь на...", hint: "", options: [
+    { text: "Виживанні і утриманні позицій — зараз не час для стратегій", dim: "red" },
+    { text: "Збереженні того, що вже добре працює", dim: "blue" },
+    { text: "Зростанні, масштабуванні та конкурентній перевазі", dim: "orange" },
+    { text: "Добробуті людей і позитивному впливі", dim: "green" },
+    { text: "Еволюції системи і довгостроковій стійкості", dim: "yellow" }
+  ]},
+  { text: "Що я відчуваю, коли хтось ставить під сумнів мої рішення?", hint: "", options: [
+    { text: "Злість або роздратування — я приймаю рішення, моє слово останнє", dim: "red" },
+    { text: "Захищаю позицію — рішення прийнято за правилами", dim: "blue" },
+    { text: "Відкритий до дискусії, якщо є кращі дані", dim: "orange" },
+    { text: "Трохи вразливий — мені важлива підтримка команди", dim: "green" },
+    { text: "Цікавлюсь — можливо, я щось не врахував", dim: "yellow" }
+  ]},
+  { text: "Як я підходжу до делегування?", hint: "", options: [
+    { text: "Майже не делегую — простіше зробити самому, ніж пояснювати", dim: "red" },
+    { text: "Даю чіткі інструкції і перевіряю виконання", dim: "blue" },
+    { text: "Ставлю ціль і контролюю результат", dim: "orange" },
+    { text: "Довіряю людям і підтримую їх у процесі", dim: "green" },
+    { text: "Адаптую підхід до людини і контексту", dim: "yellow" }
+  ]},
+  { text: "Що для мене означає \"хороша організаційна культура\"?", hint: "", options: [
+    { text: "Сильні люди, які можуть діяти швидко і не скаржаться", dim: "red" },
+    { text: "Дисципліна, ієрархія і відповідальність", dim: "blue" },
+    { text: "Результативність, меритократія і амбіції", dim: "orange" },
+    { text: "Психологічна безпека, включеність і турбота", dim: "green" },
+    { text: "Усвідомленість, гнучкість і системне мислення", dim: "yellow" }
+  ]},
+  { text: "Коли я бачу проблему, я насамперед запитую...", hint: "", options: [
+    { text: "\"Хто відповідальний і чому це досі не вирішено?\"", dim: "red" },
+    { text: "\"Яке правило порушено і як це виправити?\"", dim: "blue" },
+    { text: "\"Який найефективніший спосіб вирішити це?\"", dim: "orange" },
+    { text: "\"Хто постраждав і як ми можемо допомогти?\"", dim: "green" },
+    { text: "\"Що ця проблема говорить про систему?\"", dim: "yellow" }
+  ]},
+  { text: "Моє ставлення до помилок в команді...", hint: "", options: [
+    { text: "Помилки — це слабкість. Хто помиляється двічі — той не в моїй команді", dim: "red" },
+    { text: "Помилки неприпустимі — є стандарти, яких треба дотримуватись", dim: "blue" },
+    { text: "Помилки — це втрати, їх треба мінімізувати", dim: "orange" },
+    { text: "Помилки — людські, важливо підтримати і навчитись", dim: "green" },
+    { text: "Помилки — це інформація про систему, яку треба осмислити", dim: "yellow" }
+  ]},
+  { text: "Що мені важко прийняти в роботі з людьми?", hint: "", options: [
+    { text: "Слабкість, нерішучість і скиглення — у нас немає часу на це", dim: "red" },
+    { text: "Хаос, непередбачуваність і порушення домовленостей", dim: "blue" },
+    { text: "Неефективність, пасивність і відсутність амбіцій", dim: "orange" },
+    { text: "Байдужість, конкуренцію і відсутність підтримки", dim: "green" },
+    { text: "Жорсткість, негнучкість і небажання розвиватись", dim: "yellow" }
+  ]},
+  { text: "Коли мені потрібно обрати між швидким результатом і правильним процесом...", hint: "Немає єдиної правильної відповіді — важливо ваше справжнє відчуття", options: [
+    { text: "Завжди результат — процес можна налагодити потім, якщо виживемо", dim: "red" },
+    { text: "Процес важливіший — правила захищають від більших помилок", dim: "blue" },
+    { text: "Результат важливіший — процес адаптується під ціль", dim: "orange" },
+    { text: "Залежить від людей у команді і їхніх потреб", dim: "green" },
+    { text: "Це помилкова дихотомія — шукаю третій шлях", dim: "yellow" }
+  ]}
+];
+
+const DIM_META = {
+  red:    { label: "Червоний",     color: "red",    name: "Сила і виживання" },
+  blue:   { label: "Синій",        color: "blue",   name: "Порядок і стабільність" },
+  orange: { label: "Помаранчевий", color: "orange", name: "Досягнення і результат" },
+  green:  { label: "Зелений",      color: "green",  name: "Спільнота і турбота" },
+  yellow: { label: "Жовтий",       color: "yellow", name: "Системне мислення" }
+};
+
+const PROFILE_TITLES = {
+  red:    { founder: "Вольовий лідер",      manager: "Командир",             team: "Бойова одиниця",      hr: "Захисник порядку" },
+  blue:   { founder: "Архітектор систем",   manager: "Хранитель стандартів", team: "Надійний виконавець", hr: "Захисник процесів" },
+  orange: { founder: "Стратег результату",  manager: "Драйвер ефективності", team: "Орієнтований на ціль", hr: "Аналітик талантів" },
+  green:  { founder: "Будівничий культури", manager: "Лідер команди",        team: "Серце колективу",     hr: "Захисник людей" },
+  yellow: { founder: "Системний мислитель", manager: "Адаптивний лідер",     team: "Каталізатор змін",    hr: "Архітектор розвитку" }
+};
+
+const ROLE_LABELS = {
+  founder: "Засновник / CEO",
+  manager: "Менеджер / тімлід",
+  team:    "Член команди",
+  hr:      "HR / OD спеціаліст"
+};
+
+// === СТАН ===
+let selectedRole = null;
+let currentQ = 0;
+let answers = [];
+let scores = { red: 0, blue: 0, orange: 0, green: 0, yellow: 0 };
+let lastResultText = '';
+let currentOrderId = null;
+let currentPcts = null;
+let currentDominant = null;
+let paymentCheckInterval = null;
+
+
+
+function selectRole(el) {
+  document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedRole = el.dataset.role;
+  document.getElementById('btn-start').disabled = false;
+}
+
+function startTest() {
+  currentQ = 0;
+  answers = new Array(QUESTIONS.length).fill(null);
+  scores = { red: 0, blue: 0, orange: 0, green: 0, yellow: 0 };
+  showScreen('s-question');
+  renderQ();
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderQ() {
+  const q = QUESTIONS[currentQ];
+  const pct = Math.round((currentQ / QUESTIONS.length) * 100);
+  document.getElementById('q-step').textContent = `Питання ${currentQ + 1} з ${QUESTIONS.length}`;
+  document.getElementById('q-pct').textContent = pct + '%';
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('q-text').textContent = q.text;
+  document.getElementById('q-hint').textContent = q.hint;
+  const answersEl = document.getElementById('answers');
+  answersEl.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'answer-btn' + (answers[currentQ] === i ? ' selected' : '');
+    btn.innerHTML = `<span class="answer-marker"></span><span>${opt.text}</span>`;
+    btn.onclick = () => pickAnswer(i);
+    answersEl.appendChild(btn);
+  });
+  document.getElementById('btn-next').disabled = answers[currentQ] === null;
+  document.getElementById('btn-next').textContent = currentQ === QUESTIONS.length - 1 ? 'Завершити' : 'Далі →';
+  document.getElementById('btn-back').style.visibility = currentQ === 0 ? 'hidden' : 'visible';
+}
+
+function pickAnswer(i) {
+  answers[currentQ] = i;
+  document.querySelectorAll('.answer-btn').forEach((b, idx) => b.classList.toggle('selected', idx === i));
+  document.getElementById('btn-next').disabled = false;
+}
+
+function nextQ() {
+  if (answers[currentQ] === null) return;
+  const dim = QUESTIONS[currentQ].options[answers[currentQ]].dim;
+  scores[dim]++;
+  if (currentQ < QUESTIONS.length - 1) { currentQ++; renderQ(); }
+  else { showResults(); }
+}
+
+function prevQ() {
+  if (currentQ > 0) {
+    const prevDim = QUESTIONS[currentQ - 1].options[answers[currentQ - 1]]?.dim;
+    if (prevDim) scores[prevDim] = Math.max(0, scores[prevDim] - 1);
+    currentQ--;
+    renderQ();
+  }
+}
+
+function getDominant() {
+  return Object.entries(scores).sort((a, b) => b[1] - a[1])[0][0];
+}
+
+function showResults() {
+  const total = Object.values(scores).reduce((a, b) => a + b, 0);
+  const pcts = {};
+  Object.keys(scores).forEach(k => { pcts[k] = Math.round((scores[k] / total) * 100); });
+  const dominant = getDominant();
+  currentPcts = pcts;
+  currentDominant = dominant;
+
+  // Зберігаємо стан для відновлення після редиректу
+  localStorage.setItem('curly_state', JSON.stringify({
+    role: selectedRole,
+    pcts: pcts,
+    dominant: dominant
+  }));
+
+  buildResultFrame(dominant, pcts);
+  showScreen('s-result');
+  setTimeout(() => animateBars(), 150);
+
+  document.getElementById('payment-gate').style.display = 'block';
+  document.getElementById('interpretation-gate').style.display = 'none';
+}
+
+function buildResultFrame(dominant, pcts) {
+  document.getElementById('result-role-tag').textContent = ROLE_LABELS[selectedRole];
+  document.getElementById('result-title').textContent = PROFILE_TITLES[dominant][selectedRole];
+  const sorted = Object.entries(pcts).sort((a, b) => b[1] - a[1]);
+  const barsEl = document.getElementById('bars-section');
+  barsEl.innerHTML = sorted.map(([k, v]) => `
+    <div class="bar-row">
+      <span class="bar-label">${DIM_META[k].label}</span>
+      <div class="bar-track"><div class="bar-fill ${DIM_META[k].color}" style="width:0%" data-val="${v}"></div></div>
+      <span class="bar-pct">${v}%</span>
+    </div>`).join('');
+}
+
+function animateBars() {
+  document.querySelectorAll('.bar-fill').forEach(el => { el.style.width = el.dataset.val + '%'; });
+}
+
+async function startPayment() {
+  const emailInput = document.getElementById('email-input');
+  const email = emailInput.value.trim();
+
+  if (!email || !email.includes('@')) {
+    emailInput.style.borderColor = '#C0392B';
+    emailInput.focus();
+    return;
+  }
+  emailInput.style.borderColor = '';
+
+  const btn = document.getElementById('btn-pay');
+  btn.disabled = true;
+  btn.textContent = 'Завантаження...';
+
+  try {
+    const res = await fetch('/api/payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: email,
+        role: selectedRole,
+        pcts: currentPcts,
+        dominant: currentDominant
+      })
+    });
+    const data = await res.json();
+
+    if (!data.pageUrl) {
+      throw new Error('No payment URL');
+    }
+
+    localStorage.setItem('curly_invoice', data.invoiceId);
+
+    window.location.href = data.pageUrl;
+
+  } catch (err) {
+    btn.disabled = false;
+    btn.textContent = 'Отримати розшифровку';
+    alert('Помилка підключення. Спробуйте ще раз.');
+  }
+}
+
+async function checkPaymentAndUnlock(orderId) {
+  try {
+    const res = await fetch('/api/verify?orderId=' + orderId);
+    const data = await res.json();
+    if (data.paid) {
+      clearInterval(paymentCheckInterval);
+      document.getElementById('payment-gate').style.display = 'none';
+      document.getElementById('interpretation-gate').style.display = 'block';
+      document.getElementById('interpretation-body').innerHTML = '<div style="color:var(--ink-muted);font-size:14px;padding:1rem 0">⏳ Зачекайте хвилинку — опрацьовуємо ваші результати...</div>';
+      loadInterpretation();
+    }
+  } catch (err) {}
+}
+
+async function loadInterpretation() {
+  const pcts = currentPcts;
+  const dominant = currentDominant;
+
+  const redNote = pcts.red > 30
+    ? `\nВАЖЛИВО: у цієї людини ${pcts.red}% червоного рівня. Це адаптація до стресу, кризи або війни — не патологія. Розшифровка без засудження: визнати силу цього стану, показати де він допомагає і де починає шкодити, як рухатись далі.`
+    : '';
+
+  const prompt = `Ти — експерт з методології Curly Management та інтегральної Spiral Dynamics.
+
+Людина пройшла тест на цінності.
+Роль: ${ROLE_LABELS[selectedRole]}
+
+Ціннісний профіль:
+- Червоний (сила, виживання, імпульсивна дія, контроль): ${pcts.red}%
+- Синій (порядок, стабільність, правила): ${pcts.blue}%
+- Помаранчевий (досягнення, ефективність, результат): ${pcts.orange}%
+- Зелений (спільнота, турбота, стосунки): ${pcts.green}%
+- Жовтий (системне мислення, адаптивність): ${pcts.yellow}%
+Домінуючий рівень: ${DIM_META[dominant].name}
+${redNote}
+
+Напиши детальну персоналізовану розшифровку. ОБОВ'ЯЗКОВО використовуй точно такий формат:
+
+[SECTION:ХТО ВИ]
+2-3 речення про суть цього ціннісного профілю. Говори від другої особи (ви).
+[/SECTION]
+
+[SECTION:ПАТЕРНИ ПОВЕДІНКИ]
+3-4 конкретних поведінкових патерни. Впізнавані ситуації з життя.
+[/SECTION]
+
+[SECTION:СИЛЬНІ СТОРОНИ]
+3-4 реальні переваги профілю в ролі ${ROLE_LABELS[selectedRole]}.
+[/SECTION]
+
+[SECTION:ДЕ ЦЕ ЗАВАЖАЄ]
+2-3 конкретні ситуації де профіль створює труднощі. Чесно і точно.
+[/SECTION]
+
+[SECTION:ЩО РОЗВИВАТИ]
+2-3 конкретних кроки до цілісності через логіку Curly: цінність → принцип → чеснота → компетенція.
+[/SECTION]
+
+Пиши українською. Пряма, тепла мова. Без жаргону. Без води.`;
+
+  try {
+    const res = await fetch('/api/anthropic', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-5', max_tokens: 1800, messages: [{ role: 'user', content: prompt }] })
+    });
+    const data = await res.json();
+    const text = data.content?.[0]?.text || 'Помилка отримання відповіді';
+    const bodyEl = document.getElementById('interpretation-body');
+    renderSections(bodyEl, text);
+    lastResultText = text;
+  } catch (err) {
+    document.getElementById('interpretation-body').textContent = 'Розшифровка тимчасово недоступна. Спробуйте оновити сторінку.';
+  }
+}
+
+function renderSections(container, raw) {
+  const sectionRegex = /\[SECTION:([^\]]+)\]([\s\S]*?)\[\/SECTION\]/g;
+  let html = '';
+  let match;
+  while ((match = sectionRegex.exec(raw)) !== null) {
+    const title = match[1].trim();
+    const body = match[2].trim();
+    html += `<div class="interp-section"><div class="interp-section-title">${title}</div><div class="interp-section-body">${body}</div></div>`;
+  }
+  if (!html) {
+    html = `<div class="interp-section-body">${raw.replace(/\[SECTION:[^\]]*\]|\[\/SECTION\]/g, '').trim()}</div>`;
+  }
+  container.innerHTML = html;
+}
+
+function toggleLegend(el) {
+  el.classList.toggle('open');
+  document.getElementById('legend-grid').classList.toggle('visible');
+}
+
+function emailResult() {
+  const title = document.getElementById('result-title').textContent;
+  const role = document.getElementById('result-role-tag').textContent;
+  const text = document.getElementById('interpretation-body').innerText;
+  const subject = encodeURIComponent(`Мій ціннісний профіль: ${title}`);
+  const body = encodeURIComponent(`${role}\n\n${title}\n\n${text}\n\n— Curly Management Bureau\ntest-2-mu-olive.vercel.app`);
+  window.location.href = `mailto:?subject=${subject}&body=${body}`;
+}
+
+function copyResult() {
+  const title = document.getElementById('result-title').textContent;
+  const text = document.getElementById('interpretation-body').textContent;
+  const out = `Мій ціннісний профіль: ${title}\n\n${text}\n\n— Curly Management Bureau`;
+  navigator.clipboard?.writeText(out).then(() => {
+    const btns = document.querySelectorAll('.result-actions .btn-ghost');
+    const btn = btns[btns.length - 1];
+    const orig = btn.textContent;
+    btn.textContent = 'Скопійовано ✓';
+    setTimeout(() => { btn.textContent = orig; }, 2000);
+  });
+}
+
+function restart() {
+  selectedRole = null;
+  currentQ = 0;
+  answers = [];
+  scores = { red: 0, blue: 0, orange: 0, green: 0, yellow: 0 };
+  currentPcts = null;
+  currentDominant = null;
+  localStorage.removeItem('curly_scores_display');
+  document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('btn-start').disabled = true;
+  showScreen('s-intro');
+}
+
+// Відновлення після повернення з Monobank
+window.onload = async function() {
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('paid') === '1') {
+    const saved = localStorage.getItem('curly_state');
+    const invoiceId = localStorage.getItem('curly_invoice');
+    
+    if (saved) {
+      try {
+        const state = JSON.parse(saved);
+        selectedRole = state.role;
+        currentPcts = state.pcts;
+        currentDominant = state.dominant;
+
+        showScreen('s-result');
+        buildResultFrame(state.dominant, state.pcts);
+        setTimeout(animateBars, 300);
+
+        document.getElementById('payment-gate').style.display = 'none';
+        document.getElementById('interpretation-gate').style.display = 'block';
+        document.getElementById('interpretation-body').innerHTML = '<div style="color:var(--ink-muted);font-size:14px;padding:1rem 0">⏳ Перевіряємо оплату...</div>';
+        window.history.replaceState({}, '', window.location.pathname);
+
+        // Перевіряємо статус оплати через Monobank API
+        if (invoiceId) {
+          try {
+            const res = await fetch('/api/verify?orderId=' + invoiceId);
+            const data = await res.json();
+            
+            if (data.paid) {
+              localStorage.removeItem('curly_state');
+              localStorage.removeItem('curly_invoice');
+              document.getElementById('interpretation-body').innerHTML = '<div style="color:var(--ink-muted);font-size:14px;padding:1rem 0">⏳ Зачекайте хвилинку — опрацьовуємо ваші результати...</div>';
+              loadInterpretation();
+            } else {
+              document.getElementById('interpretation-body').innerHTML = '<div style="color:var(--ink-muted);font-size:14px;padding:1rem 0">Оплата ще обробляється. Оновіть сторінку через хвилину.</div>';
+            }
+          } catch (e) {
+            document.getElementById('interpretation-body').innerHTML = '<div style="color:var(--ink-muted);font-size:14px;padding:1rem 0">Не вдалось перевірити оплату. Оновіть сторінку.</div>';
+          }
+        }
+      } catch(e) {
+        console.error('Помилка відновлення:', e);
+      }
+    }
+  }
+};
+</script>
+</body>
+</html>
